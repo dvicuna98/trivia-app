@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:upstrivia/providers/trivia_provider.dart';
+import 'package:provider/provider.dart';
 
 class GameSelectorButton extends StatelessWidget {
   final String title;
   final Color color;
-  const GameSelectorButton({Key? key, required this.title, required this.color}) : super(key: key);
+  final String gameUuid;
+  const GameSelectorButton({Key? key, required this.title, required this.color, required this.gameUuid}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<TriviaProvider>(context);
+
     return InkWell(
       child: Container(
         height: 180,
@@ -25,7 +30,8 @@ class GameSelectorButton extends StatelessWidget {
           ),
         ),
       ),
-      onTap: (){
+      onTap: () async {
+        await provider.getQuestionOfCategories(gameUuid);
         Navigator.of(context).pushReplacementNamed('QuestionPage');
       },
     );

@@ -28,7 +28,9 @@ class _CustomAppBarState extends State<CustomAppBar> {
               ),
               GestureDetector(
                   child: const Icon(Icons.logout,color: Colors.white,),
-                onTap: (){},
+                onTap: () {
+                  Navigator.of(context).pushReplacementNamed('Login');
+                },
               ),
 
             ],

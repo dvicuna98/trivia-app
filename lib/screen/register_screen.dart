@@ -1,5 +1,8 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:upstrivia/providers/trivia_provider.dart';
+import 'package:provider/provider.dart';
 import '../widgets/widgets.dart';
 
 class RegisterScreen extends StatelessWidget {
@@ -7,16 +10,18 @@ class RegisterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<TriviaProvider>(context);
 
     final formKey = GlobalKey<FormState>();
+    bool loading = false;
 
     final Map<String, String> formValues = {
       'first_name':'',
-      'last_name':'',
+      'surname':'',
+      "country": "United States",
       'username':'',
       'email':'',
       'password':'',
-      'role':'basic'
 
     };
 
@@ -34,7 +39,7 @@ class RegisterScreen extends StatelessWidget {
                 formProperty: 'first_name',formValues: formValues,),
               const SizedBox(height: 10,),
               CustomInputField(labelText: 'Apellido',hintText: 'Apellido Usuario',
-                  formProperty: 'last_name',formValues: formValues),
+                  formProperty: 'surname',formValues: formValues),
               const SizedBox(height: 10,),
               CustomInputField(labelText: 'Username',hintText: 'Sobrenombre',
                   formProperty: 'username',formValues: formValues),
@@ -48,8 +53,9 @@ class RegisterScreen extends StatelessWidget {
 
               const SizedBox(height: 10,),
               ElevatedButton(
-                  onPressed: (){
+                  onPressed: loading? null: () async {
 
+                    loading = true;
                     FocusScope.of(context).requestFocus(FocusNode());
 
                     if(!formKey.currentState!.validate()){
@@ -57,7 +63,23 @@ class RegisterScreen extends StatelessWidget {
                       return;
                     }
 
-                    print(formValues);
+
+                    var statusCode = await provider.createNewUser(json.encode(formValues));
+                    if(statusCode == 201){
+                      final snackBar = SnackBar(
+                        content: const Text('Usuario creado'),
+                        action: SnackBarAction(
+                          label: 'cerrar',
+                          onPressed: () {
+                          },
+                        ),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      Navigator.of(context).pushReplacementNamed('Login');
+                    }
+
+                    loading = false;
+
                   },
                   child: const SizedBox(
                     width: double.infinity,

@@ -1,5 +1,8 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:upstrivia/providers/trivia_provider.dart';
+import 'package:provider/provider.dart';
 import '../widgets/widgets.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -9,11 +12,11 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final formKey = GlobalKey<FormState>();
+    final provider = Provider.of<TriviaProvider>(context);
 
     final Map<String, String> formValues = {
       'email':'',
-      'password':'',
-      'role':'basic'
+      'password':''
     };
 
     return Scaffold(
@@ -49,7 +52,7 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
               ElevatedButton(
-                  onPressed: (){
+                  onPressed: () async {
 
                     FocusScope.of(context).requestFocus(FocusNode());
 
@@ -58,8 +61,14 @@ class LoginScreen extends StatelessWidget {
                       return;
                     }
 
-                    Navigator.of(context).pushReplacementNamed('HomePage');
-                    print(formValues);
+                    var statusCode = await provider.loginApp(json.encode(formValues));
+
+                    if(statusCode == 200) {
+                      await provider.getCategories();
+                      Navigator.of(context).pushReplacementNamed('HomePage');
+                    }
+
+
                   },
                   child: const SizedBox(
                     width: double.infinity,
